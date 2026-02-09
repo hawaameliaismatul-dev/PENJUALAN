@@ -46,7 +46,7 @@ $user_id = $_SESSION['user_id'];
                     <div class="panel panel-success">
                         <div class="panel-body text-center">
                             <i class="glyphicon glyphicon-calendar" style="font-size:40px;"></i>
-                            <h3><?php echo mysqli_num_rows($hari); ?></h3>
+                            <h3><?php echo mysqli_num_rows($jual); ?></h3>
                             <p>Penjualan Hari Ini</p>
                         </div>
                     </div>
@@ -67,44 +67,60 @@ $user_id = $_SESSION['user_id'];
         </div>
     </div>
 
-    <!-- RIWAYAT PENJUALAN -->
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h4><i class="glyphicon glyphicon-list-alt"></i> Riwayat Penjualan Terakhir</h4>
-        </div>
-
-        <div class="panel-body">
-            <table class="table table-bordered table-striped">
-                <tr>
-                    <th width="5%">No</th>
-                    <th>ID Jual</th>
-                    <th>Barang</th>
-                    <th>Tanggal</th>
-                    <th>Total Harga</th>
-                </tr>
-
-                <?php
-                $data = mysqli_query($koneksi,"SELECT penjualan.*, barang.nama_barang 
-                                               FROM penjualan 
-                                               JOIN barang ON penjualan.id_barang = barang.id_barang 
-                                               WHERE penjualan.user_id = '$user_id' 
-                                               ORDER BY penjualan.id_jual DESC 
-                                               LIMIT 10");
-                $no = 1;
-                while ($d = mysqli_fetch_array($data)) {
-                ?>
-                    <tr>
-                        <td><?php echo $no++; ?></td>
-                        <td><?php echo $d['id_jual']; ?></td>
-                        <td><?php echo $d['nama_barang']; ?></td>
-                        <td><?php echo $d['tgl_jual']; ?></td>
-                        <td><?php echo "Rp. " . number_format($d['total_harga']); ?></td>
-                    </tr>
-                <?php 
-                } 
-                ?>
-            </table>
-        </div>
+   <!-- RIWAYAT PENJUALAN -->
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>
+            <i class="glyphicon glyphicon-list-alt"></i> Riwayat Penjualan Terbaru
+        </h4>
     </div>
 
+    <div class="panel-body">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>ID Jual</th>
+                    <th>Tanggal</th>
+                    <th>Kasir</th>
+                    <th>Nama Barang</th>
+                    <th>Jumlah Item</th>
+                    <th>Total Harga</th>
+                </tr>
+            </thead>
+
+            <tbody>
+            <?php
+            $data = mysqli_query($koneksi,"
+                SELECT 
+                    p.id_jual,
+                    p.tgl_jual,
+                    p.total_harga,
+                    u.user_nama,
+                    GROUP_CONCAT(b.nama_barang SEPARATOR ', ') AS nama_barang,
+                    SUM(d.jumlah) AS jumlah_item
+                FROM penjualan p
+                JOIN user u ON p.user_id = u.user_id
+                JOIN penjualan_detail d ON p.id_jual = d.id_jual
+                JOIN barang b ON d.id_barang = b.id_barang
+                GROUP BY p.id_jual
+                ORDER BY p.id_jual DESC
+            ");
+
+            $no = 1;
+            while($d = mysqli_fetch_assoc($data)){
+            ?>
+                <tr>
+                    <td><?= $no++; ?></td>
+                    <td>INVOICE-<?= $d['id_jual']; ?></td>
+                    <td><?= date('d-m-Y', strtotime($d['tgl_jual'])); ?></td>
+                    <td><?= $d['user_nama']; ?></td>
+                    <td><?= $d['nama_barang']; ?></td>
+                    <td><?= $d['jumlah_item']; ?></td>
+                    <td>Rp <?= number_format($d['total_harga']); ?></td>
+                </tr>
+            <?php } ?>
+            </tbody>
+        </table>
+    </div>
 </div>

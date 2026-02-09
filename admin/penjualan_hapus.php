@@ -15,4 +15,4 @@ mysqli_query($koneksi, "DELETE FROM penjualan_detail WHERE id_jual = '$id_jual'"
 // Hapus penjualan
 mysqli_query($koneksi, "DELETE FROM penjualan WHERE id_jual = '$id_jual'");
 
-echo "<script>alert('Transaksi berhasil dihapus'); window.location='penjualan.php';</script>";
+echo "<script>alert('Data akan dihapus?');window.location.href='penjualan.php'</script>";

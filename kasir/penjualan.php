@@ -1,60 +1,76 @@
 <?php
 include 'header.php';
 include '../koneksi.php';
-
-$user_id = $_SESSION['user_id'] ?? 0;
-if($user_id == 0){
-    echo "<script>alert('Silahkan login dulu');window.location='../index.php';</script>";
-    exit();
-}
 ?>
 
 <div class="container">
-<div class="panel panel-default">
-<div class="panel-heading">
-<h4><b>Riwayat Penjualan</b></h4>
-</div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4><b>Data Penjualan</b></h4>
+        </div>
 
-<div class="panel-body">
+        <div class="panel-body">
 
-<table class="table table-bordered table-striped">
-<tr>
-    <th>No</th>
-    <th>Tanggal</th>
-    <th>Barang</th>
-    <th>Jumlah</th>
-    <th>Total Harga</th>
-    <th>Opsi</th>
-</tr>
+            <a href="penjualan_tambah.php" class="btn btn-sm btn-info pull-right">
+                Transaksi Baru
+            </a>
+            <br><br>
 
-<?php
-$data = mysqli_query($koneksi,"SELECT penjualan.*, barang.nama_barang, barang.harga_jual FROM penjualan JOIN barang ON penjualan.id_barang=barang.id_barang WHERE user_id='$user_id' ORDER BY id_jual DESC ");
-$no=1;
-while($d=mysqli_fetch_array($data)){
-?>
-<tr>
-    <td><?= $no++; ?></td>
-    <td><?= $d['tgl_jual']; ?></td>
-    <td><?= $d['nama_barang']; ?></td>
-    <td><?= $d['total_harga'] / $d['harga_jual']; ?></td>
-    <td>Rp <?= number_format($d['total_harga']); ?></td>
-    <td>
-    
-        <a href="penjualan_edit.php?id=<?= $d['id_jual']; ?>" class="btn btn-warning btn-xs">
-            <i class="glyphicon glyphicon-pencil"></i> Edit
-        </a>
-    </td>
-</tr>
-<?php
- } 
- ?>
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Invoice</th>
+                        <th>Tanggal</th>
+                        <th>Kasir</th>
+                        <th>Barang</th>
+                        <th>Total Item</th>
+                        <th>Total Harga</th>
+                        <th width="12%">Opsi</th>
+                    </tr>
+                </thead>
 
-</table>
+                <tbody>
+                <?php
+                $query = mysqli_query($koneksi,"
+                    SELECT 
+                        p.id_jual,
+                        p.tgl_jual,
+                        p.total_harga,
+                        u.user_nama,
+                        GROUP_CONCAT(b.nama_barang SEPARATOR ', ') AS daftar_barang,
+                        SUM(d.jumlah) AS total_item
+                    FROM penjualan p
+                    JOIN user u ON p.user_id = u.user_id
+                    JOIN penjualan_detail d ON p.id_jual = d.id_jual
+                    JOIN barang b ON d.id_barang = b.id_barang
+                    GROUP BY p.id_jual
+                    ORDER BY p.id_jual DESC
+                ");
 
-<a href="penjualan_tambah.php" class="btn btn-primary">
-    + Transaksi Baru
-</a>
+                $no = 1;
+                while($d = mysqli_fetch_assoc($query)){
+                ?>
+                    <tr>
+                        <td><?= $no++; ?></td>
+                        <td>INVOICE-<?= $d['id_jual']; ?></td>
+                        <td><?= date('d-m-Y', strtotime($d['tgl_jual'])); ?></td>
+                        <td><?= $d['user_nama']; ?></td>
+                        <td><?= $d['daftar_barang']; ?></td>
+                        <td><?= $d['total_item']; ?> item</td>
+                        <td>Rp <?= number_format($d['total_harga']); ?></td>
+                        <td class="text-center">
+                            <a href="penjualan_invoice.php?id=<?= $d['id_jual']; ?>" 
+                               class="btn btn-warning btn-xs">
+                                Invoice
+                            </a>
+                        </td>
+                    </tr>
+                <?php } ?>
+                </tbody>
 
-</div>
-</div>
+            </table>
+
+        </div>
+    </div>
 </div>

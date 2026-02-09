@@ -17,7 +17,106 @@ $p = mysqli_fetch_assoc(mysqli_query($koneksi,"
     <div class="panel panel-default">
         <div class="panel-heading">
             <h4><b>Detail Penjualan</b></h4>
-        </div>
+        </div><?php
+include '../koneksi.php';
+
+$dari   = $_GET['dari'];
+$sampai = $_GET['sampai'];
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cetak Laporan Penjualan</title>
+    <style>
+        body{
+            font-family: Arial, sans-serif;
+        }
+        h2{
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .periode{
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        table{
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        th, td{
+            border: 1px solid #000;
+            padding: 6px;
+            text-align: center;
+        }
+        th{
+            background: #f0f0f0;
+        }
+        .total{
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<h2>LAPORAN DATA PENJUALAN</h2>
+<div class="periode">
+    Periode: <?= date('d-m-Y', strtotime($dari)); ?> s/d <?= date('d-m-Y', strtotime($sampai)); ?>
+</div>
+
+<table>
+    <tr>
+        <th>No</th>
+        <th>No Invoice</th>
+        <th>Tanggal</th>
+        <th>Nama Kasir</th>
+        <th>Nama Barang</th>
+        <th>Harga Jual</th>
+        <th>Total Harga</th>
+    </tr>
+
+<?php
+$no = 1;
+$grand_total = 0;
+
+$data = mysqli_query($koneksi,"
+    SELECT p.*, b.nama_barang, b.harga_jual, u.user_nama
+    FROM penjualan p
+    JOIN barang b ON p.id_barang = b.id_barang
+    JOIN user u ON p.user_id = u.user_id
+    WHERE DATE(p.tgl_jual) BETWEEN '$dari' AND '$sampai'
+    ORDER BY p.tgl_jual ASC
+");
+
+while($d = mysqli_fetch_array($data)){
+    $grand_total += $d['total_harga'];
+?>
+<tr>
+    <td><?= $no++; ?></td>
+    <td>TRX<?= $d['id_jual']; ?></td>
+    <td><?= date('d-m-Y', strtotime($d['tgl_jual'])); ?></td>
+    <td><?= $d['user_nama']; ?></td>
+    <td><?= $d['nama_barang']; ?></td>
+    <td>Rp <?= number_format($d['harga_jual']); ?></td>
+    <td>Rp <?= number_format($d['total_harga']); ?></td>
+</tr>
+<?php } ?>
+
+<tr class="total">
+    <td colspan="6">TOTAL KESELURUHAN</td>
+    <td>Rp <?= number_format($grand_total); ?></td>
+</tr>
+</table>
+
+<script>
+    window.print();
+</script>
+
+</body>
+</html>
+
 
         <div class="panel-body">
 

@@ -1,56 +1,73 @@
-<?php
+<?php 
 include 'header.php';
 include '../koneksi.php';
-// session_start();  // Hapus karena sudah di header.php
 ?>
 
 <div class="container">
-<div class="panel panel-default">
-<div class="panel-heading">
-<h4>Tambah Penjualan</h4>
-</div>
-<div class="panel-body">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4><b>Tambah Penjualan</b></h4>
+        </div>
+        <div class="panel-body">
 
-<form action="penjualan_aksi.php" method="post">
 
-<table class="table table-bordered">
-<tr>
-    <th>Barang</th>
-    <th>Jumlah</th>
-</tr>
+            <form method="post" action="penjualan_aksi.php">
 
-<?php
-$barang_list = mysqli_query($koneksi,"SELECT * FROM barang WHERE stok > 0");
+                <div class="form-group">
+                    <label>Tanggal</label>
+                    <input type="date" name="tgl_jual" class="form-control" required>
+                </div>
 
-for($i=0;$i<5;$i++){
-?>
-<tr>
-    <td>
-        <select name="id_barang[]" class="form-control">
-            <option value="">-- Pilih Barang --</option>
-            <?php
-            mysqli_data_seek($barang_list,0);
-            while($b = mysqli_fetch_assoc($barang_list)){
-            ?>
-            <option value="<?= $b['id_barang'] ?>">
-                <?= $b['nama_barang'] ?> (Stok: <?= $b['stok'] ?>)
-            </option>
-            <?php } ?>
-        </select>
-    </td>
-    <td>
-        <input type="number" name="jumlah[]" class="form-control" min="1">
-    </td>
-</tr>
-<?php } ?>
+                <div class="form-group">
+                    <label>Kasir</label>
+                    <select name="user_id" class="form-control" required>
+                        <option value="">- Pilih Kasir -</option>
+                        <?php
+                        $u = mysqli_query($koneksi,"SELECT * FROM user");
+                        while($us=mysqli_fetch_array($u)){
+                        ?>
+                        <option value="<?= $us['user_id']; ?>">
+                            <?= $us['user_nama']; ?>
+                        </option>
+                        <?php } ?>
+                    </select>
+                </div>
 
-</table>
+                <hr>
+                <h4>Daftar Barang</h4>
 
-<input type="submit" name="tambah" value="Simpan" class="btn btn-primary">
-<a href="penjualan.php" class="btn btn-default">Kembali</a>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Barang</th>
+                        <th>Jumlah</th>
+                    </tr>
 
-</form>
+                    <?php for($i=0;$i<5;$i++){ ?>
+                    <tr>
+                        <td>
+                            <select name="id_barang[]" class="form-control">
+                                <option value="">- Pilih Barang -</option>
+                                <?php
+                                $b = mysqli_query($koneksi,"SELECT * FROM barang");
+                                while($br=mysqli_fetch_array($b)){
+                                ?>
+                                <option value="<?= $br['id_barang']; ?>">
+                                    <?= $br['nama_barang']; ?> (stok: <?= $br['stok']; ?>)
+                                </option>
+                                <?php } ?>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="number" name="jumlah[]" class="form-control" min="1">
+                        </td>
+                    </tr>
+                    <?php } ?>
+                </table>
 
-</div>
-</div>
+                <input type="submit" value="Simpan Penjualan" class="btn btn-primary">
+                <a href="penjualan.php" class="btn btn-default">Kembali</a>
+
+            </form>
+        </div>
+    </div>
 </div>

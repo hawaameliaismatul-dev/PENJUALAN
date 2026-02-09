@@ -51,11 +51,6 @@ $halaman = basename($_SERVER['PHP_SELF']);
                 </a>
             </li>
 
-            <li class="<?= $halaman=='laporan.php'?'active':'' ?>">
-                <a href="laporan.php">
-                    <i class="glyphicon glyphicon-list-alt"></i> Laporan
-                </a>
-            </li>
 
             <li class="dropdown <?= ($page == 'ganti_password.php') ? 'active' : '' ?>">
                     <a href="#" class="dropdown-toggle"

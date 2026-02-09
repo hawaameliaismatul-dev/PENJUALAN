@@ -11,7 +11,7 @@ include '../koneksi.php';
         <div class="panel-body">
 
             <a href="barang_tambah.php" class="btn btn-sm btn-info pull-right">
-                + Tambah Barang
+                Tambah Barang
             </a>
 
             <br><br>

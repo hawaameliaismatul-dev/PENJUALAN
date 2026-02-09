@@ -11,7 +11,7 @@ include '../koneksi.php';
         <div class="panel-body">
 
             <a href="user_tambah.php" class="btn btn-sm btn-info pull-right">
-                + Tambah User
+                Tambah User
             </a>
 
             <br><br>
